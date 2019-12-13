@@ -3,6 +3,7 @@
 import requests
 import time
 
+
 ip_dispositivo = "192.168.1.200"
 conf_route = "/r_u_here"
 
@@ -19,10 +20,10 @@ if __name__ == "__main__":
     while(num_failed_conection < 10):
         time.sleep(5)
         try:
-            resp = requests.get(ip_dispositivo+conf_route)
+            resp = requests.get("http://" + ip_dispositivo + conf_route)
         except:
             num_failed_conection += 1
-            print("Intento "+str(num_failed_conection)+"...")
+            print("Intento " + str(num_failed_conection) + "...")
     
     # Punto de salida si no se conecta a tiempo #
     if(num_failed_conection == 10):
@@ -31,6 +32,8 @@ if __name__ == "__main__":
     
     # Emitimos mensaje de conexion # 
     print("Dispositivo uCARE conectado!")
+
+    
 
     
     

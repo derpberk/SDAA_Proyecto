@@ -14,8 +14,8 @@
 
 /* Asignamos el SSID y la contraseña de la red WiFi */
 #ifndef STASSID
-#define STASSID "Redmi"
-#define STAPSK  "123456789"
+#define STASSID "MIWIFI_2G_69FZ"
+#define STAPSK  "VHqTa9kt"
 #endif
 
 #define led 12
@@ -36,7 +36,7 @@ void handleRoot() {
 
 }
 
-void drawGraph() {
+void sensorsHandler() {
     
   /* Valores provisionales */
   int pulso = 60;
@@ -72,6 +72,11 @@ void handleNotFound() {
 
 }
 
+void r_u_here_handler() {
+  server.send(200, "text/plain", r_u_here_web_str);
+
+}
+
 
 void setup() {
 
@@ -98,7 +103,8 @@ void setup() {
     Serial.println(WiFi.localIP());
 
     server.on("/", handleRoot);
-    server.on("/getSensors", drawGraph);
+    server.on("/getSensors", sensorsHandler);
+    server.on("/r_u_here", r_u_here_handler);
     server.onNotFound(handleNotFound);
     server.begin();
     Serial.println("HTTP server started");
