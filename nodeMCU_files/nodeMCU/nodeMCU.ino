@@ -14,41 +14,24 @@
 
 /* Asignamos el SSID y la contraseña de la red WiFi */
 #ifndef STASSID
-#define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STASSID "Redmi"
+#define STAPSK  "123456789"
 #endif
 
-IPAddress ip(192,168,1,200);     
-IPAddress gateway(192,168,1,1);   
-IPAddress subnet(255,255,255,0);   
-
-#define BUILTIN_LED 12
+#define led 12
 
 const char *ssid = STASSID;     /* SSID de la red a conectar - Pasarela residencial*/
 const char *password = STAPSK; /* Contraseña de acceso a la pasarela residencial */
 
 /**
- * Clase tipo WebServer en el puerto 80
+ * Función handler para el directorio raíz de la página WEB - www.wherever.wv\ 
  */
 ESP8266WebServer server(80);
 
-const int led = BUILTIN_LED; /*< Led de la placa para debuggin */
-
-/**
- * Función handler para el directorio raíz de la página WEB - www.wherever.wv\ */
 void handleRoot() {
 
   digitalWrite(led, 1);
   server.send(200, "text/html", root_web_str);
-  digitalWrite(led, 0);
-
-}
-
-void handleNotFound() {
-
-  digitalWrite(led, 1);
-  String message = "ERROR 404: File Not Found\n\n";
-  server.send(404, "text/plain", message);
   digitalWrite(led, 0);
 
 }
@@ -66,23 +49,32 @@ void drawGraph() {
 
   /* Componemos la medida de pulso */
   out += "<p><strong><em>Datos del servidor</em></strong></p>";
-  snprintf(temp,"<p><em>Pulso medio: %d</em></p>",pulso);
+  sprintf(temp,"<p><em>Pulso medio: %d</em></p>",pulso);
   out += temp;
 
   /* Componemos la medida de pulso */
-  snprintf(temp,"<p><em>Oxigeno: %d</em></p>",oxigeno);
+  sprintf(temp,"<p><em>Oxigeno: %d</em></p>",oxigeno);
   out += temp;
 
   /* Componemos la medida de pulso */
-  snprintf(temp,"<p><em>Acel: %d</em></p>",acel);
+  sprintf(temp,"<p><em>Acel: %d</em></p>",acel);
   out += temp;
 
   server.send(200, "text/html", out);
 }
 
+void handleNotFound() {
 
-void setup(void) {
-  
+  digitalWrite(led, 1);
+  String message = "ERROR 404: File Not Found\n\n";
+  server.send(404, "text/plain", message);
+  digitalWrite(led, 0);
+
+}
+
+
+void setup() {
+
     /* Pin de debuggin */
     pinMode(led, OUTPUT);
     digitalWrite(led, LOW);
@@ -90,7 +82,6 @@ void setup(void) {
     /* Inicializamos el puerto serie para depuración */
     Serial.begin(115200);
     WiFi.mode(WIFI_STA);
-    WiFi.config(ip, gateway, subnet);
     WiFi.begin(ssid, password);
     Serial.println("");
 
@@ -106,11 +97,6 @@ void setup(void) {
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
 
- /*   if (MDNS.begin("esp8266")) {
-  *      Serial.println("MDNS responder started");
-  *  }
-  */
-
     server.on("/", handleRoot);
     server.on("/getSensors", drawGraph);
     server.onNotFound(handleNotFound);
@@ -118,7 +104,8 @@ void setup(void) {
     Serial.println("HTTP server started");
 }
 
-void loop(void) {
+
+void loop() {
 
   server.handleClient();
   
