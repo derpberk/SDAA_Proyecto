@@ -7,14 +7,14 @@
 /* Definiciones de los nombres de los topics de comunicacion */
 
 #define MQTT_TOPIC_IN "ucare_topic_in"
-#define MQTT_TOPIC_OUT "ucare_topic_out"
-#define TM 2000 // Tiempo de refresco para transmitir datos de los sensores //
+#define MQTT_TOPIC_OUT "sensors/acc"
+#define TM 200 // Tiempo de refresco para transmitir datos de los sensores //
 
 /* Datos de la red. Configrurar antes */
 
-const char* ssid = "Redmi";
-const char* password = "123456789";
-const char* mqtt_server = "192.168.43.165";
+const char* ssid = "MIWIFI_2G_69FZ";
+const char* password = "VHqTa9kt";
+const char* mqtt_server = "192.168.1.130";
 
 /* Creamos el objeto de cliente WiFi */
 WiFiClient espClient;
@@ -108,7 +108,11 @@ void setup() {
   client.setCallback(callback);
 }
 
+int d[10] = {0,1,2,3,4,5,6,7,8,9};
+int j = 0;
+
 void loop() {
+  float n;
 
   /* Verificacion de la conexion */
   if (!client.connected()) {
@@ -121,9 +125,13 @@ void loop() {
 
   if (now - lastMsg > TM) {
 
+    n = random(-10,10)*0.05;
+
     lastMsg = now;
-    msg = "IM HERE";
+    snprintf(msg,5,"%.4f",sin(d[j]/10*(2*3.141592))+n);
     client.publish(MQTT_TOPIC_OUT, msg);
+    j++;
+    if(j == 10) j = 0;
 
   }
 
