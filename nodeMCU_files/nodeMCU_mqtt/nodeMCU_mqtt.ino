@@ -4,11 +4,21 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
+/** Sensor Libraries */
+#include <MPU6050_tockn.h>
+#include <Wire.h>
+
 /* Definiciones de los nombres de los topics de comunicacion */
 
 #define MQTT_TOPIC_IN "ucare_topic_in"
-#define MQTT_TOPIC_OUT "sensors/acc"
+#define MQTT_TOPIC_OUT_ACC "sensors/acc"
+#define MQTT_TOPIC_OUT_OXI "sensors/oxigen"
+#define MQTT_TOPIC_OUT_PUL "sensors/pulse"
 #define TM 200 // Tiempo de refresco para transmitir datos de los sensores //
+
+/* Variable sensores */
+MPU6050 mpu6050(Wire);
+float ax,ay,az;
 
 /* Datos de la red. Configrurar antes */
 
@@ -103,16 +113,16 @@ void reconnect() {
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(115200);
+  Wire.begin();
+  mpu6050.begin();  
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 }
 
-int d[10] = {0,1,2,3,4,5,6,7,8,9};
-int j = 0;
 
 void loop() {
-  float n;
+  mpu6050.update();
 
   /* Verificacion de la conexion */
   if (!client.connected()) {
@@ -125,13 +135,23 @@ void loop() {
 
   if (now - lastMsg > TM) {
 
-    n = random(-10,10)*0.05;
+    /** Publicamos los datos de los sensores */
 
+    // Sensor de Oxigeno en sangre - DEBUGGIN//
     lastMsg = now;
-    snprintf(msg,5,"%.4f",sin(d[j]/10*(2*3.141592))+n);
-    client.publish(MQTT_TOPIC_OUT, msg);
-    j++;
-    if(j == 10) j = 0;
+    snprintf(msg,5,"%.4f",99 + ((float)rand(0,40) - 20)/100);
+    client.publish(MQTT_TOPIC_OUT_OXI, msg);
+
+    // Sensor de Pulso - DEBUGGIN//
+    lastMsg = now;
+    snprintf(msg,5,"%.4f",75 + ((float)rand(0,10) - 5));
+    client.publish(MQTT_TOPIC_OUT_PUL, msg);
+
+    // Sensor de Acelerometro - DEBUGGIN//
+    lastMsg = now;
+    snprintf(msg,5,"%.4f",75 + ((float)rand(0,10) - 5));
+    client.publish(MQTT_TOPIC_OUT_ACC, msg);
+    
 
   }
 
