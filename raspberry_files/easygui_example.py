@@ -8,8 +8,10 @@ import sys
 from statemachine import StateMachine
 
 motion_enable = False
+graficas_enable = False
 proceso_motion = []
 proceso_visor = []
+proceso_graficas = []
 
 def start_window(txt):
     msg = """ Bienvenido a la interfaz de U-CARE!\n
@@ -33,7 +35,7 @@ def buttons_window(txt):
     reply = buttonbox(msg, choices = ["Salir"], image = ["camera.png","graphs.png"], cancel_choice="Salir")
 
     if reply == "Salir":
-        return("STATE_Exit",txt)
+        return("STATE_R_U_SURE",txt)
     elif reply == "camera.png":
         return("STATE_Camera",txt)
     elif reply == "graphs.png":
@@ -61,8 +63,16 @@ def camera_handler(txt):
 
 def graficos_hanlder(txt):
 
-    # Aquí deberíamos hacer las cositas adecuadas como mostrar los graficos y llevarnos al NODE-RED GUI#
-    pass
+    global proceso_graficas
+    global graficas_enable
+
+    if graficas_enable == False:
+        # Aquí deberíamos hacer las cositas adecuadas como mostrar los graficos y llevarnos al NODE-RED GUI#
+        graficas_enable = True
+        proceso_graficas = subprocess.Popen(['python','main_code.py'])
+
+    else:
+        pass
 
     return("STATE_Buttons",txt)
     
@@ -72,7 +82,7 @@ def exit_function(txt):
     global proceso_motion
     global proceso_visor
 
-    print("Voy a apagar todo...")
+    print("Apagando ...")
     time.sleep(3)
     if motion_enable == True:
 
@@ -82,7 +92,22 @@ def exit_function(txt):
         proceso_visor.terminate()
         proceso_visor.communicate()
 
+    if graficas_enable == True:
+        proceso_graficas.terminate()
+        proceso_graficas.communicate()
+        
     return("Bye_state",txt)
+
+def are_you_sure_function(txt):
+
+    msg = "Voy a cerrar todo. Estas seguro?"
+    choices = ["Si","No"]
+    reply = buttonbox(msg, choices = choices, cancel_choice="No")
+
+    if reply == "Si":
+        return("STATE_Exit",txt)
+    else:
+        return("STATE_Buttons",txt)
 
 
 
@@ -100,6 +125,7 @@ if __name__== "__main__":
     m.add_state("STATE_Camera", camera_handler)
     m.add_state("STATE_Graficos", graficos_hanlder)
     m.add_state("STATE_Exit", exit_function)
+    m.add_state("STATE_R_U_SURE", are_you_sure_function)
     m.add_state("Bye_state",None,end_state=1)
     m.set_start("STATE_Welcome")
     m.run("Exec")

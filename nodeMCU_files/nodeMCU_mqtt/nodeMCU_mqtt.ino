@@ -24,7 +24,7 @@ float ax,ay,az;
 
 const char* ssid = "MIWIFI_2G_69FZ";
 const char* password = "VHqTa9kt";
-const char* mqtt_server = "192.168.1.130";
+const char* mqtt_server = "192.168.1.138";
 
 /* Creamos el objeto de cliente WiFi */
 WiFiClient espClient;
@@ -95,7 +95,7 @@ void reconnect() {
       Serial.println("connected");
 
       // Once connected, publish an announcement...
-      client.publish(MQTT_TOPIC_OUT, "I'M ALIVE!!!");
+      client.publish(MQTT_TOPIC_OUT_ACC, "I'M ALIVE!!!");
       // ... and resubscribe
       client.subscribe(MQTT_TOPIC_IN);
 
@@ -139,17 +139,19 @@ void loop() {
 
     // Sensor de Oxigeno en sangre - DEBUGGIN//
     lastMsg = now;
-    snprintf(msg,5,"%.4f",99 + ((float)rand(0,40) - 20)/100);
+    snprintf(msg,5,"%.4f",99 + ((float)random(0,40) - 20)/100);
     client.publish(MQTT_TOPIC_OUT_OXI, msg);
 
     // Sensor de Pulso - DEBUGGIN//
-    lastMsg = now;
-    snprintf(msg,5,"%.4f",75 + ((float)rand(0,10) - 5));
+    snprintf(msg,5,"%.4f",75 + ((float)random(0,10) - 5));
     client.publish(MQTT_TOPIC_OUT_PUL, msg);
 
     // Sensor de Acelerometro - DEBUGGIN//
-    lastMsg = now;
-    snprintf(msg,5,"%.4f",75 + ((float)rand(0,10) - 5));
+    ax = mpu6050.getAccX();
+    ay = mpu6050.getAccY();
+    az = mpu6050.getAccZ();
+    
+    snprintf(msg,5,"%.4f",sqrt(ax*ax+ay*ay+az*az));
     client.publish(MQTT_TOPIC_OUT_ACC, msg);
     
 

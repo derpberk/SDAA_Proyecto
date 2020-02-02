@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 from printlog import printlog as printlog 
 import numpy as np
 
-BROKER_LOCALHOST_IP = "192.168.1.130"
+BROKER_LOCALHOST_IP = "192.168.1.138"
 CLIENT_ID = "random_acc_generator"
 ACC_SENSOR_TOPIC = "sensors/acc"
 

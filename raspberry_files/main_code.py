@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 
 # Parametros de conexion #
 CLIENT_ID = "Raspbi_ID"
-BROKER_LOCALHOST_IP = "192.168.1.130"
-DEVICE_IP = "192.168.1.255" 
+BROKER_LOCALHOST_IP = "192.168.1.138"
+DEVICE_IP = "192.168.1.138" 
 ACC_SENSOR_TOPIC = "sensors/acc"
 PULSE_SENSOR_TOPIC = "sensors/pulse"
 OXI_SENSOR_TOPIC = "sensors/oxigen"
@@ -118,6 +118,7 @@ if __name__ == "__main__":
         client.subscribe(ACC_SENSOR_TOPIC)
         client.subscribe(PULSE_SENSOR_TOPIC)
         client.subscribe(OXI_SENSOR_TOPIC)
+        printlog("CRASH","INFO")
         client.on_message = data_handler
         printlog("Conectado a los sensores","OK")
     
@@ -136,18 +137,24 @@ if __name__ == "__main__":
         FLAG_new_data = False
         time.sleep(0.5)
         if(FLAG_new_data): # Si hay un nuevo dato #
-            printlog("ACTUALIZAMOS LOS DATOS","INFO")
+            # printlog("ACTUALIZAMOS LOS DATOS","INFO")
 
             # Visualizacion de una variable #
-            # UNDER CONSTRUCTION #
+            
             plt.clf()
 
-            plt.subplot(2,1,1)
+            ax1 = plt.subplot(3,1,1)
             plt.plot(t_acc_vct,acc_vct,'r-')
+            ax1.set(xlabel='t (s)', ylabel='Aceleracion (G)')
 
-            plt.subplot(2,1,2)
-            plt.plot(t_acc_vct,acc_vct,'r-')
-            
+            ax2 = plt.subplot(3,1,2)
+            plt.plot(t_pulse_vct,pulse_vct,'b-')
+            ax2.set(xlabel='t (s)', ylabel='Pulso (Puls/min)')
+
+            ax3 = plt.subplot(3,1,3)
+            plt.plot(t_oxigen_vct,oxigen_vct,'g-')
+            ax3.set(xlabel='t (s)', ylabel='Sat. Oxi (%)')
+
             plt.draw()
 
             plt.pause(0.001)
