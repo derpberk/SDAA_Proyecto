@@ -24,7 +24,7 @@ float ax,ay,az;
 
 const char* ssid = "MIWIFI_2G_69FZ";
 const char* password = "VHqTa9kt";
-const char* mqtt_server = "192.168.1.138";
+const char* mqtt_server = "192.168.1.137";
 
 /* Creamos el objeto de cliente WiFi */
 WiFiClient espClient;
@@ -116,7 +116,7 @@ void setup() {
   Wire.begin();
   mpu6050.begin();  
   setup_wifi();
-  client.setServer(mqtt_server, 1883);
+  client.setServer(mqtt_server, 1880);
   client.setCallback(callback);
 }
 
