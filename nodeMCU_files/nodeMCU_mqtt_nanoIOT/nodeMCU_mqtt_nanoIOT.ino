@@ -1,7 +1,12 @@
 #include <WiFiNINA.h>
 #include <PubSubClient.h>
 
-#define TM 500 /* Milisegundos entre transmision */
+/** Sensor Libraries */
+#include <MPU6050_tockn.h>
+#include <Wire.h>
+
+
+#define TM 200 /* Milisegundos entre transmision */
 
 /* Definiciones de los nombres de los topics de comunicacion */
 
@@ -21,6 +26,10 @@ int status = WL_IDLE_STATUS;
 long lastMsg = 0;
 char msg[50];
 int value = 0;
+
+/* Variable sensores */
+MPU6050 mpu6050(Wire);
+float ax,ay,az;
 
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
@@ -92,6 +101,9 @@ void setup() {
   client.setServer(mqttServer, 1883);
   client.setCallback(callback);
 
+  /* Nos conectamos con los sensores */
+  Wire.begin();
+  mpu6050.begin();  
 }
 
 void reconnect() 
@@ -135,6 +147,9 @@ void loop()
   if (now - lastMsg > TM) 
   {
 
+    /* Actualizamos el valor de los acelerometros */
+    mpu6050.update();
+
     /** Publicamos los datos de los sensores */
 
     // Sensor de Oxigeno en sangre - DEBUGGIN//
@@ -146,13 +161,13 @@ void loop()
     snprintf(msg,5,"%.4f",75 + ((float)random(0,10) - 5));
     client.publish(MQTT_TOPIC_OUT_PUL, msg);
 
-    /*
+    
     // Sensor de Acelerometro - DEBUGGIN//
     ax = mpu6050.getAccX();
     ay = mpu6050.getAccY();
-    az = mpu6050.getAccZ(); */
+    az = mpu6050.getAccZ();
     
-    snprintf(msg,5,"%.4f",75 + ((float)random(0,10) - 5));
+    snprintf(msg,5,"%.4f",sqrt(ax*ax+ay*ay+az*az));
     client.publish(MQTT_TOPIC_OUT_ACC, msg);
   }
 }
