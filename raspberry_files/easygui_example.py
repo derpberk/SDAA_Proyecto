@@ -9,9 +9,11 @@ from statemachine import StateMachine
 
 motion_enable = False
 graficas_enable = False
+servos_enable = False
 proceso_motion = []
 proceso_visor = []
 proceso_graficas = []
+proceso_servos = []
 
 def start_window(txt):
     msg = """ Bienvenido a la interfaz de U-CARE!\n
@@ -31,8 +33,7 @@ def start_window(txt):
 def buttons_window(txt):
 
     msg = "Escoja la opcion que quiera"
-    choices = ["CARE-Cam","Monitorizacion","Desconectar"]
-    reply = buttonbox(msg, choices = ["Salir"], image = ["camera.png","graphs.png"], cancel_choice="Salir")
+    reply = buttonbox(msg, choices = ["Salir"], image = ["camera.png","graphs.png","servo.png"], cancel_choice="Salir")
 
     if reply == "Salir":
         return("STATE_R_U_SURE",txt)
@@ -40,6 +41,8 @@ def buttons_window(txt):
         return("STATE_Camera",txt)
     elif reply == "graphs.png":
         return("STATE_Graficos",txt)
+    elif reply == "servo.png":
+        return("STATE_cameracontrol",txt)
 
 def camera_handler(txt):
 
@@ -81,6 +84,7 @@ def exit_function(txt):
     global motion_enable
     global proceso_motion
     global proceso_visor
+    global proceso_servos   
 
     print("Apagando ...")
     time.sleep(3)
@@ -95,6 +99,10 @@ def exit_function(txt):
     if graficas_enable == True:
         proceso_graficas.terminate()
         proceso_graficas.communicate()
+
+    if servos_enable == True:
+        proceso_servos.terminate()
+        proceso_servos.communicate()
         
     return("Bye_state",txt)
 
@@ -110,7 +118,19 @@ def are_you_sure_function(txt):
         return("STATE_Buttons",txt)
 
 
+def cameracontrol_function(txt):
+    global servos_enable
+    global proceso_servos
 
+    # Ventana de control de los servomotores #
+    if servos_enable == False:
+        servos_enable = True
+        proceso_servos = subprocess.Popen(['python','control_camera_position.py'])
+    else:
+        msgbox("El programa de control de la cámara ya está abierto.", title="Atención")
+
+    return("STATE_Buttons",txt)
+    
 
     
     
@@ -126,29 +146,7 @@ if __name__== "__main__":
     m.add_state("STATE_Graficos", graficos_hanlder)
     m.add_state("STATE_Exit", exit_function)
     m.add_state("STATE_R_U_SURE", are_you_sure_function)
+    m.add_state("STATE_cameracontrol", cameracontrol_function)
     m.add_state("Bye_state",None,end_state=1)
     m.set_start("STATE_Welcome")
     m.run("Exec")
-
-
-"""
-while 1:
-    msgbox("Hello, world!")
-
-    msg ="What is your favorite flavor?"
-    title = "Ice Cream Survey"
-    choices = ["Vanilla", "Chocolate", "Strawberry", "Rocky Road"]
-    choice = choicebox(msg, title, choices)
-
-    # note that we convert choice to string, in case
-    # the user cancelled the choice, and we got None.
-    msgbox("You chose: " + str(choice), "Survey Result")
-
-    msg = "Do you want to continue?"
-    title = "Please Confirm"
-    if ccbox(msg, title):     # show a Continue/Cancel dialog
-        pass  # user chose Continue
-    else:
-        sys.exit(0)           # user chose Cancel
-
-"""
