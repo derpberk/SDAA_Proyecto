@@ -9,9 +9,9 @@ from printlog import printlog as printlog # Funcion especial para imprimir logs 
 import matplotlib.pyplot as plt
 
 # Parametros de conexion #
-CLIENT_ID = "Raspbi_ID"
-BROKER_LOCALHOST_IP = "192.168.1.138"
-DEVICE_IP = "192.168.1.138" 
+CLIENT_ID = "Raspbi_Mqtt_Client"
+BROKER_LOCALHOST_IP = "broker.hivemq.com"
+DEVICE_IP = "U-CARE-GLOVE"
 ACC_SENSOR_TOPIC = "sensors/acc"
 PULSE_SENSOR_TOPIC = "sensors/pulse"
 OXI_SENSOR_TOPIC = "sensors/oxigen"
