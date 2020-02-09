@@ -1,4 +1,4 @@
-for pushover import init, Client
+from pushover import init, Client
 import paho.mqtt.client as mqtt
 from printlog import printlog as printlog # Funcion especial para imprimir logs creada para la ocasion #
 import smtplib
@@ -14,6 +14,7 @@ EMAIL_SOURCE = "sdaa.ucare@gmail.com"
 EMAIL_PASSWD = "ucaresdaa"
 EMAIL_PUSHOVER = "gikmri6cy1@pomail.net"
 FLAG_new_data = False
+ACC_THRESHOLD = 0.4
 msg_email = []
 
 dato = 1
@@ -67,7 +68,7 @@ if __name__ == "__main__":
             # Reseteamos el flag
             FLAG_new_data = False
             
-            if(data < ACC_THRESHOLD): # Se ha detectado una caida #
+            if(dato < ACC_THRESHOLD): # Se ha detectado una caida #
 
                 # Avisamos por email #
                 printlog("TERRIBLES NOTICIAS. SE HA DETECTADO UNA CAIDA","ERROR")
